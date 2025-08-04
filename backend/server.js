@@ -9,7 +9,7 @@ const saltRounds = 10;
 
 
 const app = express();
-const PORT = 3000;
+
 
 // Middleware
 app.use(cors());
@@ -328,9 +328,12 @@ app.get('/api/debug/users', (req, res) => {
 
 
 // Iniciar servidor
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Servidor disponible en red local: http://192.168.1.148:${PORT}`);
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor escuchando en el puerto ${PORT}`);
 });
+
 
 // Marcar mensajes como leídos
 app.post('/api/messages/marcar-leidos', (req, res) => {
