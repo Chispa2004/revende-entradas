@@ -131,31 +131,27 @@
     }
 
     @media (max-width: 599px) {
-  .card.entrada {
-    padding: 12px;
-  }
+      .card.entrada {
+        padding: 12px;
+      }
 
-  .entrada h3 {
-    font-size: 16px;
-  }
+      .entrada h3 {
+        font-size: 16px;
+      }
 
-  .entrada .info {
-    font-size: 13px;
-  }
+      .entrada .info {
+        font-size: 13px;
+      }
 
-  .entrada .precio {
-    font-size: 14px;
-  }
+      .entrada .precio {
+        font-size: 14px;
+      }
 
-  .entrada button {
-    padding: 8px 14px;
-    font-size: 14px;
-  }
-}
-
-
-
-
+      .entrada button {
+        padding: 8px 14px;
+        font-size: 14px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -201,10 +197,9 @@
   <script src="header.js"></script>
   <script>
     const BASE_URL = location.hostname === 'localhost'
-  ? 'http://localhost:3000'
-  : 'https://revende-entradas.onrender.com';
+      ? 'http://localhost:3000'
+      : 'https://revende-entradas.onrender.com';
 
-;
     let todasLasEntradas = [], entradasFiltradas = [], paginaActual = 1;
     const entradasPorPagina = 10;
 
@@ -247,7 +242,12 @@
 
     function formatearFecha(fechaISO) {
       const fecha = new Date(fechaISO);
-      return fecha.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      return fecha.toLocaleDateString('es-ES', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
     }
 
     function mostrarEntradas() {
