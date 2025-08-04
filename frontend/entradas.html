@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Entradas disponibles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: #f8f8f8;
+    }
+
+    .hero {
+      background-color: #2196F3;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin-bottom: 10px;
+      font-size: 24px;
+    }
+
+    .hero input,
+    .hero button {
+      padding: 12px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    .hero button {
+      background-color: white;
+      color: #2196F3;
+      font-weight: bold;
+    }
+
+    .container {
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 10px;
+    }
+
+    .filtros-avanzados input,
+    .ordenador select,
+    #buscador-discoteca {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 15px;
+    }
+
+    #contador-entradas {
+      margin-top: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .grid-entradas {
+      display: grid;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .card.entrada {
+      background: white;
+      border-radius: 10px;
+      padding: 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    .entrada h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .entrada .info {
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .entrada .precio {
+      margin: 8px 0;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .entrada button {
+      background-color: #2196F3;
+      color: white;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    #ver-mas {
+      display: block;
+      margin: 30px auto 0;
+      background-color: #2196F3;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      border: none;
+      font-weight: bold;
+    }
+
+    @media (min-width: 600px) {
+      .grid-entradas {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 900px) {
+      .grid-entradas {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 599px) {
+  .card.entrada {
+    padding: 12px;
+  }
+
+  .entrada h3 {
+    font-size: 16px;
+  }
+
+  .entrada .info {
+    font-size: 13px;
+  }
+
+  .entrada .precio {
+    font-size: 14px;
+  }
+
+  .entrada button {
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+}
+
+
+
+
+  </style>
+</head>
+<body>
+
+  <header id="main-header"></header>
+
+  <div class="hero">
+    <h1>Revende Entradas</h1>
+    <input type="text" id="buscador" placeholder="Buscar por ciudad" />
+    <h2 style="font-size: 18px; margin-top: 20px;">🎉 ¿No puedes ir a un evento?</h2>
+    <p style="margin-top: 10px;">Publica tu entrada aquí y deja que otro la aproveche.<br>O compra entradas de última hora para discotecas, festivales y más.</p>
+    <a href="publicar.html"><button>Publicar una entrada</button></a>
+  </div>
+
+  <div class="container">
+    <h1>Entradas disponibles</h1>
+    <input type="text" id="buscador-discoteca" placeholder="Buscar por discoteca o evento" />
+
+    <div class="filtros-avanzados">
+      <input type="date" id="fecha-min" />
+      <input type="date" id="fecha-max" />
+      <input type="number" id="precio-min" placeholder="Precio mínimo (€)" min="0" />
+      <input type="number" id="precio-max" placeholder="Precio máximo (€)" min="0" />
+    </div>
+
+    <div class="ordenador">
+      <label for="ordenar-por">Ordenar por:</label>
+      <select id="ordenar-por">
+        <option value="fecha_asc">Fecha más próxima</option>
+        <option value="fecha_desc">Fecha más lejana</option>
+        <option value="precio_asc">Precio más bajo</option>
+        <option value="precio_desc">Precio más alto</option>
+      </select>
+    </div>
+
+    <p id="contador-entradas"></p>
+    <div id="aviso-invitado" style="text-align:center; color: #555;"></div>
+    <div id="loader" class="loader" style="display:none;"></div>
+    <div id="lista-entradas" class="grid-entradas"></div>
+    <button id="ver-mas" onclick="cargarMasEntradas()">Ver más</button>
+  </div>
+
+  <script src="header.js"></script>
+  <script>
+    const BASE_URL = 'http://localhost:3000';
+;
+    let todasLasEntradas = [], entradasFiltradas = [], paginaActual = 1;
+    const entradasPorPagina = 10;
+
+    async function cargarEntradas() {
+      document.getElementById('loader').style.display = 'block';
+      const res = await fetch(`${BASE_URL}/api/entries`);
+      const entradas = await res.json();
+      document.getElementById('loader').style.display = 'none';
+      todasLasEntradas = entradas.filter(e => !e.comprador_id);
+      aplicarFiltros();
+    }
+
+    function aplicarFiltros() {
+      paginaActual = 1;
+      const ciudad = document.getElementById('buscador').value.toLowerCase();
+      const discoteca = document.getElementById('buscador-discoteca').value.toLowerCase();
+      const fechaMin = document.getElementById('fecha-min').value;
+      const fechaMax = document.getElementById('fecha-max').value;
+      const precioMin = parseFloat(document.getElementById('precio-min').value);
+      const precioMax = parseFloat(document.getElementById('precio-max').value);
+      const orden = document.getElementById('ordenar-por').value;
+
+      entradasFiltradas = todasLasEntradas.filter(e => {
+        const ciudadMatch = e.ciudad.toLowerCase().includes(ciudad);
+        const discotecaMatch = e.titulo.toLowerCase().includes(discoteca);
+        const fecha = new Date(e.fecha);
+        const fechaMatch = (!fechaMin || new Date(fechaMin) <= fecha) && (!fechaMax || new Date(fechaMax) >= fecha);
+        const precio = parseFloat(e.precio);
+        const precioMatch = (isNaN(precioMin) || precio >= precioMin) && (isNaN(precioMax) || precio <= precioMax);
+        return ciudadMatch && discotecaMatch && fechaMatch && precioMatch;
+      });
+
+      if (orden === 'fecha_asc') entradasFiltradas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+      else if (orden === 'fecha_desc') entradasFiltradas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+      else if (orden === 'precio_asc') entradasFiltradas.sort((a, b) => a.precio - b.precio);
+      else if (orden === 'precio_desc') entradasFiltradas.sort((a, b) => b.precio - a.precio);
+
+      mostrarEntradas();
+    }
+
+    function formatearFecha(fechaISO) {
+      const fecha = new Date(fechaISO);
+      return fecha.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function mostrarEntradas() {
+      const contenedor = document.getElementById('lista-entradas');
+      const contador = document.getElementById('contador-entradas');
+      const botonVerMas = document.getElementById('ver-mas');
+      if (paginaActual === 1) contenedor.innerHTML = "";
+
+      if (entradasFiltradas.length === 0) {
+        contador.innerText = "❌ No hay entradas disponibles.";
+        contenedor.innerHTML = '<p>No hay entradas disponibles.</p>';
+        botonVerMas.style.display = "none";
+        return;
+      }
+
+      contador.innerText = `🎫 ${entradasFiltradas.length} entradas disponibles`;
+
+      const inicio = (paginaActual - 1) * entradasPorPagina;
+      const fin = inicio + entradasPorPagina;
+      const entradasAMostrar = entradasFiltradas.slice(inicio, fin);
+
+      entradasAMostrar.forEach(e => {
+        const div = document.createElement('div');
+        div.classList.add('card', 'entrada');
+        div.innerHTML = `
+          <h3>🎫 ${e.titulo}</h3>
+          <div class="info">📍 ${e.ciudad}</div>
+          <div class="info">📅 ${formatearFecha(e.fecha)}</div>
+          <div class="precio">💰 ${e.precio} €</div>
+          <button onclick="comprarEntrada(${e.id})">Comprar</button>
+        `;
+        contenedor.appendChild(div);
+      });
+
+      botonVerMas.style.display = fin >= entradasFiltradas.length ? "none" : "block";
+    }
+
+    function cargarMasEntradas() {
+      paginaActual++;
+      mostrarEntradas();
+    }
+
+    async function comprarEntrada(id) {
+      const usuarioId = localStorage.getItem('usuarioId');
+      if (!usuarioId) return alert("Debes iniciar sesión para comprar una entrada.");
+
+      const entrada = todasLasEntradas.find(e => e.id === id);
+      if (!entrada) return alert("No se encontró la entrada.");
+
+      const vendedorId = entrada.vendedor_id;
+      const compradorId = parseInt(usuarioId);
+
+      const res = await fetch(`${BASE_URL}/api/entries/${id}/comprar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ comprador_id: compradorId })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        window.location.href = `chat.html?entry_id=${id}&user1=${compradorId}&user2=${vendedorId}`;
+      } else {
+        alert('❌ Error: ' + data.error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('buscador').addEventListener('input', aplicarFiltros);
+      document.getElementById('buscador-discoteca').addEventListener('input', aplicarFiltros);
+      document.getElementById('fecha-min').addEventListener('input', aplicarFiltros);
+      document.getElementById('fecha-max').addEventListener('input', aplicarFiltros);
+      document.getElementById('precio-min').addEventListener('input', aplicarFiltros);
+      document.getElementById('precio-max').addEventListener('input', aplicarFiltros);
+      document.getElementById('ordenar-por').addEventListener('change', aplicarFiltros);
+      cargarEntradas();
+
+      const aviso = document.getElementById('aviso-invitado');
+      if (!localStorage.getItem('usuarioId')) {
+        aviso.innerText = "Estás navegando como invitado. Regístrate para comprar o publicar entradas.";
+      }
+    });
+  </script>
+
+</body>
+</html>

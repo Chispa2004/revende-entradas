@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Mi Perfil</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .perfil-container {
+      max-width: 500px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    .foto-perfil {
+      width: 80px;
+      height: 80px;
+      background-color: #2196F3;
+      border-radius: 50%;
+      color: white;
+      font-size: 32px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .perfil-info {
+      margin-bottom: 30px;
+    }
+
+    .perfil-info input {
+      font-size: 16px;
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+      max-width: 300px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    .perfil-label {
+      font-weight: bold;
+      display: block;
+      margin-top: 10px;
+      color: #222;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .stat {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      flex: 1;
+      text-align: center;
+    }
+
+    .stat div:first-child {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .logout-btn {
+      margin-top: 30px;
+      padding: 10px 20px;
+      background-color: #e53935;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: #c62828;
+    }
+
+    .save-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .save-btn:hover {
+      background-color: #388e3c;
+    }
+
+    body.modo-oscuro .perfil-container {
+      background-color: #1e1e1e;
+      color: #f1f1f1;
+    }
+
+    body.modo-oscuro .perfil-info input {
+      background-color: #2c2c2c;
+      color: #f1f1f1;
+      border: 1px solid #555;
+    }
+
+    body.modo-oscuro .stat {
+      background-color: #2c2c2c;
+      border: 1px solid #444;
+    }
+
+    body.modo-oscuro .foto-perfil {
+      background-color: #1976d2;
+    }
+
+    body.modo-oscuro .logout-btn {
+      background-color: #b71c1c;
+    }
+
+    body.modo-oscuro .save-btn {
+      background-color: #2e7d32;
+    }
+  </style>
+</head>
+<body>
+
+  <header id="main-header"></header>
+
+  <div class="perfil-container">
+    <div class="foto-perfil" id="inicial-perfil">?</div>
+    <h2>👤 Mi Perfil</h2>
+
+    <div class="perfil-info">
+      <label class="perfil-label">Nombre:</label>
+      <input type="text" id="nombre-usuario" placeholder="Nombre">
+
+      <label class="perfil-label">Correo:</label>
+      <input type="email" id="correo-usuario" placeholder="Correo electrónico">
+
+      <button class="save-btn" onclick="guardarCambios()">Guardar cambios</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div id="publicadas">0</div>
+        <div>Publicadas</div>
+      </div>
+      <div class="stat">
+        <div id="vendidas">0</div>
+        <div>Vendidas</div>
+      </div>
+      <div class="stat">
+        <div id="compradas">0</div>
+        <div>Compradas</div>
+      </div>
+    </div>
+
+    <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
+  </div>
+
+  <script src="header.js"></script>
+  <script>
+    const usuarioId = localStorage.getItem('usuarioId');
+
+    function cerrarSesion() {
+      localStorage.removeItem('usuarioId');
+      window.location.href = 'login.html';
+    }
+
+    async function cargarPerfil() {
+      if (!usuarioId) {
+        alert("Debes iniciar sesión.");
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        const resUser = await fetch(`http://localhost:3000/api/users/${usuarioId}`);
+        const user = await resUser.json();
+
+        document.getElementById('nombre-usuario').value = user.name;
+        document.getElementById('correo-usuario').value = user.email || 'N/D';
+        document.getElementById('inicial-perfil').innerText = user.name ? user.name.charAt(0).toUpperCase() : '?';
+
+        const resEntradas = await fetch('http://localhost:3000/api/entries');
+        const entradas = await resEntradas.json();
+
+        const publicadas = entradas.filter(e => e.vendedor_id == usuarioId);
+        const vendidas = publicadas.filter(e => e.comprador_id);
+        const compradas = entradas.filter(e => e.comprador_id == usuarioId);
+
+        document.getElementById('publicadas').innerText = publicadas.length;
+        document.getElementById('vendidas').innerText = vendidas.length;
+        document.getElementById('compradas').innerText = compradas.length;
+      } catch (err) {
+        console.error("Error al cargar perfil:", err);
+      }
+    }
+
+    async function guardarCambios() {
+      const nombre = document.getElementById('nombre-usuario').value.trim();
+      const correo = document.getElementById('correo-usuario').value.trim();
+
+      if (!nombre || !correo) {
+        alert("El nombre y correo no pueden estar vacíos.");
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://localhost:3000/api/users/${usuarioId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: nombre, email: correo })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          alert("✅ Cambios guardados con éxito.");
+        } else {
+          alert("❌ " + (data.error || 'Error al guardar los cambios.'));
+        }
+      } catch (err) {
+        console.error("Error al guardar cambios:", err);
+        alert("❌ Error de conexión.");
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarPerfil);
+  </script>
+</body>
+</html>

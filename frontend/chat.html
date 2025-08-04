@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chat</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      background-color: #f4f4f4;
+    }
+
+    .chat-container {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .chat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .chat-header h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .chat-mensajes {
+      height: 400px;
+      overflow-y: auto;
+      padding: 10px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .mensaje {
+      margin: 10px 0;
+      padding: 10px 14px;
+      border-radius: 10px;
+      max-width: 75%;
+      word-wrap: break-word;
+    }
+
+    .mensaje.own {
+      background-color: #d1eaff;
+      align-self: flex-end;
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .mensaje.other {
+      background-color: #eeeeee;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    form {
+      display: flex;
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px 16px;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-volver {
+      background: #ddd;
+      color: #333;
+      padding: 6px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .btn-volver:hover {
+      background: #ccc;
+    }
+
+    /* 🌙 Modo oscuro */
+    body.modo-oscuro .chat-container {
+      background-color: #121212;
+      color: #eee;
+    }
+
+    body.modo-oscuro .chat-mensajes {
+      background-color: #1e1e1e;
+      border: 1px solid #444;
+    }
+
+    body.modo-oscuro .mensaje.own {
+      background-color: #1565c0;
+      color: white;
+    }
+
+    body.modo-oscuro .mensaje.other {
+      background-color: #444;
+      color: white;
+    }
+
+    body.modo-oscuro input,
+    body.modo-oscuro button {
+      background-color: #333;
+      color: white;
+      border-color: #555;
+    }
+
+    @media (max-width: 600px) {
+      .chat-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      form {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      input[type="text"],
+      button {
+        width: 100%;
+      }
+
+      .chat-mensajes {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header id="main-header"></header>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <a href="mensajes.html" class="btn-volver">← Volver</a>
+      <h3 id="nombre-usuario">Chat</h3>
+    </div>
+
+    <div class="chat-mensajes" id="mensajes"></div>
+
+    <form id="form-mensaje">
+      <input type="text" id="contenido" placeholder="Escribe un mensaje..." required />
+      <button type="submit">Enviar</button>
+    </form>
+  </div>
+
+  <script src="header.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const entryId = urlParams.get('entry_id');
+    const user1 = parseInt(urlParams.get('user1'));
+    const user2 = parseInt(urlParams.get('user2'));
+    const miUsuarioId = parseInt(localStorage.getItem('usuarioId'));
+
+    if (!entryId || isNaN(user1) || isNaN(user2) || isNaN(miUsuarioId)) {
+      alert("❌ URL incorrecta para el chat. Faltan datos.");
+      window.location.href = "mensajes.html";
+    }
+
+    async function cargarMensajes() {
+      const res = await fetch(`http://192.168.1.148:3000/api/messages/${entryId}/${user1}/${user2}`);
+      const mensajes = await res.json();
+      const contenedor = document.getElementById('mensajes');
+      contenedor.innerHTML = '';
+
+      mensajes.forEach(msg => {
+        const div = document.createElement('div');
+        div.className = 'mensaje ' + (msg.sender_id == miUsuarioId ? 'own' : 'other');
+        div.textContent = msg.content;
+        contenedor.appendChild(div);
+      });
+
+      contenedor.scrollTop = contenedor.scrollHeight;
+    }
+
+    async function enviarMensaje(e) {
+      e.preventDefault();
+      const contenido = document.getElementById('contenido').value;
+
+      const res = await fetch('http://192.168.1.148:3000/api/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sender_id: miUsuarioId,
+          receiver_id: user1 === miUsuarioId ? user2 : user1,
+          entry_id: entryId,
+          content: contenido
+        })
+      });
+
+      if (res.ok) {
+        document.getElementById('contenido').value = '';
+        await cargarMensajes();
+      }
+    }
+
+    async function marcarMensajesComoLeidos() {
+      await fetch('http://192.168.1.148:3000/api/messages/marcar-leidos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          entry_id: entryId,
+          sender_id: user1 === miUsuarioId ? user2 : user1,
+          receiver_id: miUsuarioId
+        })
+      });
+    }
+
+    async function cargarNombreUsuario() {
+      const otroId = user1 === miUsuarioId ? user2 : user1;
+      const res = await fetch(`http://192.168.1.148:3000/api/users/${otroId}`);
+      const user = await res.json();
+      document.getElementById('nombre-usuario').innerText = `Chat con ${user.name}`;
+    }
+
+    document.getElementById('form-mensaje').addEventListener('submit', enviarMensaje);
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      await cargarMensajes();
+      await marcarMensajesComoLeidos();
+      await cargarNombreUsuario();
+    });
+  </script>
+</body>
+</html>

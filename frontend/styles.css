@@ -1,0 +1,447 @@
+body {
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f9f9f9;
+}
+
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ✅ NUEVO NAVBAR COMPLETO */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 50px;
+  background-color: #000000;
+
+  flex-wrap: wrap;
+}
+
+.navbar-left .logo {
+  font-size: 22px;
+  margin: 0;
+  color: #ffffff;
+}
+
+.navbar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-right: 80px;
+
+}
+
+.navbar-center a {
+  text-decoration: none;
+  font-weight: 500;
+  color: #ffffff;
+  font-size: 21px;
+}
+
+.navbar-right {
+  display: flex;
+  gap: 10px;
+}
+
+.navbar-right button {
+  font-size: 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* 🌙 MODO OSCURO NAVBAR */
+body.modo-oscuro .navbar {
+  background-color: #1e1e1e;
+  border-color: #444;
+}
+
+body.modo-oscuro .navbar-center a,
+body.modo-oscuro .logo {
+  color: #eee;
+}
+
+body.modo-oscuro .navbar-right button {
+  color: #eee;
+}
+
+/* ✅ RESTO DEL DISEÑO */
+.card {
+  background-color: white;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  margin-bottom: 15px;
+  max-width: 100%;
+}
+
+button {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0b7dda;
+}
+
+.hero {
+  background: linear-gradient(to right, #e0f7fa, #e1bee7);
+  padding: 40px 0;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.hero h2 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.hero p {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.hero button {
+  background-color: #673ab7;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.hero button:hover {
+  background-color: #5e35b1;
+}
+
+.grid-entradas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: 10px;
+  }
+}
+
+.hero-title {
+  font-size: 42px;
+  font-weight: bold;
+  color: #2c2c2c;
+  margin-bottom: 30px;
+}
+
+#buscador, #buscador-discoteca {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 15px;
+  font-size: 16px;
+  margin: 20px auto;
+  display: block;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+#ver-mas {
+  padding: 10px 20px;
+  background-color: #673ab7;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 30px;
+}
+
+#ver-mas:hover {
+  background-color: #5e35b1;
+}
+
+/* 🌙 MODO OSCURO GENERAL */
+body.modo-oscuro {
+  background-color: #121212;
+  color: #f1f1f1;
+}
+
+body.modo-oscuro .card,
+body.modo-oscuro .chat-container,
+body.modo-oscuro #mensajes {
+  background-color: #1e1e1e;
+  border-color: #444;
+}
+
+body.modo-oscuro input,
+body.modo-oscuro button {
+  background-color: #2c2c2c;
+  color: #f1f1f1;
+  border: 1px solid #555;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .navbar-center {
+    margin-right: 0;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .navbar-center a {
+    font-size: 16px;
+  }
+}
+
+.btn-volver {
+  display: inline-block;
+  margin-bottom: 10px;
+  text-decoration: none;
+  font-size: 14px;
+  color: #333;
+  background-color: #f0f0f0;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.btn-volver:hover {
+  background-color: #ddd;
+}
+
+body.modo-oscuro .btn-volver {
+  background-color: #333;
+  color: #eee;
+}
+
+body.modo-oscuro .btn-volver:hover {
+  background-color: #444;
+}
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 25px;
+  background-color: #000;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.navbar-left .logo {
+  font-size: 22px;
+  margin: 0;
+  color: #fff;
+}
+
+.navbar-center {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+}
+
+.navbar-center a {
+  text-decoration: none;
+  font-weight: 500;
+  color: #fff;
+  font-size: 18px;
+}
+
+.navbar-right {
+  display: flex;
+  gap: 10px;
+}
+
+.navbar-right button {
+  font-size: 18px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+}
+
+.navbar-toggle {
+  display: none;
+  font-size: 28px;
+  color: white;
+  cursor: pointer;
+}
+
+/* 🌙 Modo oscuro */
+body.modo-oscuro .navbar {
+  background-color: #1e1e1e;
+}
+body.modo-oscuro .navbar-center a,
+body.modo-oscuro .logo,
+body.modo-oscuro .navbar-right button {
+  color: #eee;
+}
+
+/* 📱 Responsive */
+@media (max-width: 768px) {
+  .navbar-toggle {
+    display: block;
+  }
+
+  .navbar-center {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+    margin-top: 15px;
+  }
+
+  .navbar-center.show {
+    display: flex;
+  }
+
+  .navbar-center a {
+    padding: 10px;
+    border-top: 1px solid #444;
+    font-size: 16px;
+  }
+}
+
+
+/* 🌟 Tarjeta mejorada */
+.card.entrada {
+  position: relative;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-left: 5px solid #2196F3;
+}
+
+.card.entrada:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.card.entrada h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+}
+
+.card.entrada .info {
+  font-size: 15px;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card.entrada .precio {
+  font-weight: bold;
+  font-size: 18px;
+  color: #2e7d32;
+}
+
+.card.entrada button {
+  align-self: flex-start;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #2196F3;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.card.entrada button:hover {
+  background-color: #1976d2;
+}
+
+/* 🌙 Modo oscuro */
+body.modo-oscuro .card.entrada {
+  background-color: #1e1e1e;
+  border-color: #444;
+}
+
+body.modo-oscuro .card.entrada h3,
+body.modo-oscuro .card.entrada .info,
+body.modo-oscuro .card.entrada .precio {
+  color: #f1f1f1;
+}
+
+
+.filtros-avanzados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+  justify-content: center;
+}
+
+.filtros-avanzados input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  min-width: 180px;
+  flex: 1 1 180px;
+  max-width: 250px;
+  box-sizing: border-box;
+}
+
+/* 🌙 Modo oscuro */
+body.modo-oscuro .filtros-avanzados input {
+  background-color: #2c2c2c;
+  color: #f1f1f1;
+  border: 1px solid #555;
+}
+
+
+/* 🔄 Loader circular */
+.loader {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #2196F3;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: girar 1s linear infinite;
+  margin: 40px auto;
+}
+
+@keyframes girar {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 🌙 Modo oscuro */
+body.modo-oscuro .loader {
+  border: 5px solid #444;
+  border-top: 5px solid #90caf9;
+}
+
+.punto-rojo {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  margin-left: 6px;
+}

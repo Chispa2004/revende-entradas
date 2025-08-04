@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mis entradas publicadas</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .container h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 24px;
+    }
+
+    .entrada-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .entrada-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+      color: #333;
+    }
+
+    .entrada-card p {
+      margin: 4px 0;
+      color: #555;
+      font-size: 15px;
+    }
+
+    .entrada-card .estado {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .entrada-card .botones {
+      margin-top: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .entrada-card button {
+      flex: 1;
+      padding: 10px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .btn-eliminar {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .btn-eliminar:hover {
+      background-color: #d32f2f;
+    }
+
+    .btn-editar {
+      background-color: #ff9800;
+      color: white;
+    }
+
+    .btn-editar:hover {
+      background-color: #fb8c00;
+    }
+
+    /* 🌙 Modo oscuro */
+    body.modo-oscuro {
+      background-color: #121212;
+      color: #f1f1f1;
+    }
+
+    body.modo-oscuro .entrada-card {
+      background-color: #1e1e1e;
+      color: #eee;
+      border: 1px solid #444;
+    }
+
+    body.modo-oscuro .entrada-card p {
+      color: #ccc;
+    }
+
+    body.modo-oscuro .btn-eliminar {
+      background-color: #e53935;
+    }
+
+    body.modo-oscuro .btn-editar {
+      background-color: #ffa726;
+    }
+  </style>
+</head>
+<body>
+
+  <header id="main-header"></header>
+
+  <div class="container">
+    <h2>📂 Mis entradas</h2>
+    <div id="lista-mis-entradas">Cargando tus entradas...</div>
+  </div>
+
+  <script src="header.js"></script>
+  <script>
+    async function cargarMisEntradas() {
+      const usuarioId = localStorage.getItem('usuarioId');
+      const lista = document.getElementById('lista-mis-entradas');
+
+      if (!usuarioId) {
+        alert("Debes iniciar sesión.");
+        window.location.href = 'login.html';
+        return;
+      }
+
+      try {
+        const res = await fetch('http://localhost:3000/api/entries');
+        if (!res.ok) throw new Error("Error al obtener entradas");
+
+        const todas = await res.json();
+        const mias = todas.filter(e => e.vendedor_id == usuarioId);
+
+        lista.innerHTML = '';
+
+        if (!mias.length) {
+          lista.innerHTML = '<p>No has publicado ninguna entrada todavía.</p>';
+          return;
+        }
+
+        mias.forEach(e => {
+          const div = document.createElement('div');
+          div.className = 'entrada-card';
+          div.innerHTML = `
+            <h3>${e.titulo}</h3>
+            <p>📍 Ciudad: ${e.ciudad}</p>
+            <p>📅 Fecha: ${e.fecha}</p>
+            <p>💶 Precio: ${e.precio} €</p>
+            <p class="estado">Estado: ${e.comprador_id ? '✅ Vendida' : '🟢 Disponible'}</p>
+            <div class="botones">
+              ${!e.comprador_id ? `
+                <button class="btn-editar" onclick="editarEntrada(${e.id}, '${e.titulo}', '${e.ciudad}', '${e.fecha}', ${e.precio})">Editar</button>
+                <button class="btn-eliminar" onclick="eliminarEntrada(${e.id})">Eliminar</button>
+              ` : ''}
+            </div>
+          `;
+          lista.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Error al cargar entradas:", err);
+        lista.innerHTML = '<p>❌ Error al cargar tus entradas.</p>';
+      }
+    }
+
+    async function eliminarEntrada(id) {
+      if (!confirm("¿Estás seguro de que quieres eliminar esta entrada?")) return;
+
+      const res = await fetch(`http://localhost:3000/api/entries/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (res.ok) {
+        alert("Entrada eliminada");
+        cargarMisEntradas();
+      } else {
+        alert("No se pudo eliminar la entrada");
+      }
+    }
+
+    async function editarEntrada(id, titulo, ciudad, fecha, precio) {
+      const nuevoTitulo = prompt("Nuevo título:", titulo);
+      if (!nuevoTitulo) return;
+      const nuevaCiudad = prompt("Nueva ciudad:", ciudad);
+      if (!nuevaCiudad) return;
+      const nuevaFecha = prompt("Nueva fecha (YYYY-MM-DD):", fecha);
+      if (!nuevaFecha) return;
+      const nuevoPrecio = prompt("Nuevo precio:", precio);
+      if (!nuevoPrecio) return;
+
+      const res = await fetch(`http://localhost:3000/api/entries/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          titulo: nuevoTitulo,
+          ciudad: nuevaCiudad,
+          fecha: nuevaFecha,
+          precio: parseFloat(nuevoPrecio)
+        })
+      });
+
+      if (res.ok) {
+        alert("Entrada actualizada");
+        cargarMisEntradas();
+      } else {
+        alert("No se pudo actualizar la entrada");
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', cargarMisEntradas);
+  </script>
+
+</body>
+</html>

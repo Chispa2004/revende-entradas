@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Publicar entrada</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .form-container {
+      max-width: 480px;
+      width: 90%;
+      margin: 40px auto;
+      background: white;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-container h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 22px;
+    }
+
+    .form-container input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 14px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-sizing: border-box;
+    }
+
+    .form-container button[type="submit"] {
+      width: 100%;
+      padding: 14px;
+      background-color: #2196F3;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .form-container button[type="submit"]:hover {
+      background-color: #1976d2;
+    }
+
+    #mensaje {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 14px;
+      min-height: 20px;
+    }
+
+    /* 🌙 Modo oscuro */
+    body.modo-oscuro {
+      background-color: #121212;
+      color: #f1f1f1;
+    }
+
+    body.modo-oscuro .form-container {
+      background-color: #1e1e1e;
+      color: #f1f1f1;
+      border: 1px solid #444;
+    }
+
+    body.modo-oscuro input {
+      background-color: #2c2c2c;
+      color: #f1f1f1;
+      border: 1px solid #555;
+    }
+
+    body.modo-oscuro button[type="submit"] {
+      background-color: #1565c0;
+    }
+  </style>
+</head>
+<body>
+
+  <header id="main-header"></header>
+
+  <div class="form-container">
+    <h2>📝 Publicar nueva entrada</h2>
+    <form id="entrada-form">
+      <input type="text" id="titulo" placeholder="Nombre del evento o discoteca" required>
+      <input type="text" id="ciudad" placeholder="Ciudad" required>
+      <input type="date" id="fecha" required>
+      <input type="number" id="precio" placeholder="Precio (€)" required min="0">
+      <button type="submit">Publicar</button>
+    </form>
+    <p id="mensaje"></p>
+  </div>
+
+  <script src="header.js"></script>
+  <script>
+    async function publicarEntrada(event) {
+      event.preventDefault();
+
+      const usuarioId = localStorage.getItem('usuarioId');
+      if (!usuarioId) {
+        alert("Debes iniciar sesión.");
+        window.location.href = 'login.html';
+        return;
+      }
+
+      const datos = {
+        titulo: document.getElementById('titulo').value.trim(),
+        ciudad: document.getElementById('ciudad').value.trim(),
+        fecha: document.getElementById('fecha').value,
+        precio: document.getElementById('precio').value,
+        vendedor_id: usuarioId
+      };
+
+      const mensaje = document.getElementById('mensaje');
+
+      try {
+        const res = await fetch('http://localhost:3000/api/entries', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datos)
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          mensaje.innerText = '✅ Entrada publicada correctamente';
+          mensaje.style.color = 'green';
+          event.target.reset();
+        } else {
+          mensaje.innerText = '❌ Error al publicar la entrada';
+          mensaje.style.color = 'red';
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        mensaje.innerText = '❌ Error al conectar con el servidor';
+        mensaje.style.color = 'red';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('entrada-form');
+      if (form) form.addEventListener('submit', publicarEntrada);
+    });
+  </script>
+</body>
+</html>

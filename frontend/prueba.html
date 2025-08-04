@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Prueba API</title>
+</head>
+<body>
+  
+  <h2>Estadísticas generales</h2>
+  <div id="stats" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;"></div>
+
+
+  <script>
+const endpoints = [
+  { id: 'usuarios', url: '/api/stats/registrations', label: 'Usuarios registrados' },
+  { id: 'entradas', url: '/api/stats/entradas-publicadas', label: 'Entradas publicadas' },
+  { id: 'vendidas', url: '/api/stats/entradas-vendidas', label: 'Entradas vendidas' },
+  { id: 'mensajes', url: '/api/stats/mensajes', label: 'Mensajes enviados' },
+  { id: 'conversaciones', url: '/api/stats/conversaciones', label: 'Conversaciones activas' }
+];
+
+const statsContainer = document.getElementById('stats');
+
+endpoints.forEach(stat => {
+  const card = document.createElement('div');
+  card.className = 'stat-card';
+  card.id = stat.id;
+  card.textContent = `${stat.label}: cargando...`;
+  statsContainer.appendChild(card);
+
+  fetch(stat.url)
+    .then(res => res.json())
+    .then(data => {
+      card.textContent = `${stat.label}: ${data.total}`;
+    })
+    .catch(() => {
+      card.textContent = `${stat.label}: error`;
+    });
+});
+</script>
+
+</body>
+</html>

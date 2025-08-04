@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Registro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #f0f2f5;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      max-width: 420px;
+      width: 100%;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background-color: #2196F3;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #1976d2;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .text-center a {
+      color: #2196F3;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .text-center a:hover {
+      text-decoration: underline;
+    }
+
+    #mensaje {
+      font-size: 14px;
+      min-height: 20px;
+      margin-top: 10px;
+    }
+
+    body.modo-oscuro {
+      background-color: #121212;
+      color: #f1f1f1;
+    }
+
+    body.modo-oscuro .card {
+      background-color: #1e1e1e;
+      color: #f1f1f1;
+      border: 1px solid #444;
+    }
+
+    body.modo-oscuro input,
+    body.modo-oscuro button {
+      background-color: #2c2c2c;
+      color: #f1f1f1;
+      border: 1px solid #555;
+    }
+
+    body.modo-oscuro a {
+      color: #90caf9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Crear cuenta</h2>
+    <form id="registro-form">
+      <input type="text" id="name" placeholder="Nombre completo" required />
+      <input type="email" id="email" placeholder="Correo electrónico" required />
+      <input type="password" id="password" placeholder="Contraseña" required />
+      <button type="submit">Registrarse</button>
+    </form>
+
+    <p id="mensaje" class="text-center"></p>
+
+    <div class="text-center" style="margin-top: 10px;">
+      <a href="login.html">¿Ya tienes cuenta? Inicia sesión</a>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('registro-form');
+    const mensaje = document.getElementById('mensaje');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('http://localhost:3000/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          localStorage.setItem('usuarioId', data.id);
+          mensaje.innerText = "✅ Registro exitoso. Redirigiendo...";
+          setTimeout(() => {
+            window.location.href = 'entradas.html';
+          }, 1200);
+        } else {
+          mensaje.innerText = `❌ ${data.error || 'Error en el registro'}`;
+        }
+      } catch (err) {
+        console.error(err);
+        mensaje.innerText = "❌ No se pudo conectar con el servidor.";
+      }
+    });
+  </script>
+</body>
+</html>
