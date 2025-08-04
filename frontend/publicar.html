@@ -125,27 +125,33 @@
       const mensaje = document.getElementById('mensaje');
 
       try {
-        const res = await fetch('http://localhost:3000/api/entries', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(datos)
-        });
+  const BASE_URL = location.hostname === 'localhost'
+    ? 'http://localhost:3000'
+    : 'https://revende-entradas.onrender.com';
 
-        const data = await res.json();
+  const res = await fetch(`${BASE_URL}/api/entries`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos)
+  });
 
-        if (res.ok) {
-          mensaje.innerText = '✅ Entrada publicada correctamente';
-          mensaje.style.color = 'green';
-          event.target.reset();
-        } else {
-          mensaje.innerText = '❌ Error al publicar la entrada';
-          mensaje.style.color = 'red';
-        }
-      } catch (error) {
-        console.error("Error:", error);
-        mensaje.innerText = '❌ Error al conectar con el servidor';
-        mensaje.style.color = 'red';
-      }
+  const data = await res.json();
+
+  if (res.ok) {
+    mensaje.innerText = '✅ Entrada publicada correctamente';
+    mensaje.style.color = 'green';
+    event.target.reset();
+  } else {
+    mensaje.innerText = '❌ Error al publicar la entrada';
+    mensaje.style.color = 'red';
+  }
+
+} catch (error) {
+  console.error("Error:", error);
+  mensaje.innerText = '❌ Error al conectar con el servidor';
+  mensaje.style.color = 'red';
+}
+
     }
 
     document.addEventListener('DOMContentLoaded', () => {

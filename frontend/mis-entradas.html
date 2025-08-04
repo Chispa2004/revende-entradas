@@ -194,7 +194,12 @@
       const nuevoPrecio = prompt("Nuevo precio:", precio);
       if (!nuevoPrecio) return;
 
-      const res = await fetch(`http://localhost:3000/api/entries/${id}`, {
+      const BASE_URL = location.hostname === 'localhost'
+  ? 'http://localhost:3000'
+  : 'https://revende-entradas.onrender.com';
+
+const res = await fetch(`${BASE_URL}/api/entries`, {
+ 
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

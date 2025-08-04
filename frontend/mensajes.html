@@ -130,6 +130,10 @@
 
   <script src="header.js"></script>
   <script>
+    const BASE_URL = location.hostname === 'localhost'
+      ? 'http://localhost:3000'
+      : 'https://revende-entradas.onrender.com';
+
     async function cargarMensajes() {
       const userId = localStorage.getItem('usuarioId');
       const lista = document.getElementById('lista-mensajes');
@@ -141,7 +145,7 @@
       }
 
       try {
-        const res = await fetch(`http://localhost:3000/api/conversaciones/${userId}`);
+        const res = await fetch(`${BASE_URL}/api/conversaciones/${userId}`);
         if (!res.ok) throw new Error(`Error ${res.status}: No se pudo obtener mensajes`);
 
         const mensajes = await res.json();
@@ -184,7 +188,6 @@
         alert("Faltan datos para abrir el chat.");
         return;
       }
-
       window.location.href = `chat.html?entry_id=${entryId}&user1=${miUsuarioId}&user2=${otroUsuarioId}`;
     }
 
