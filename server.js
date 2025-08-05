@@ -17,6 +17,11 @@ app.use(bodyParser.json());
 const frontendPath = path.join(__dirname, 'frontend');
 app.use(express.static(frontendPath));
 
+// Página de inicio
+app.get('/', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'entradas.html'));
+});
+
 // Conexión a base de datos SQLite (ubicada en /backend/database.db)
 const dbPath = path.join(__dirname, 'backend', 'database.db');
 const db = new sqlite3.Database(dbPath, err => {
@@ -27,7 +32,19 @@ const db = new sqlite3.Database(dbPath, err => {
   }
 });
 
-// Ruta para registrar usuarios
+// Ruta: obtener todas las entradas
+app.get('/api/entries', (req, res) => {
+  db.all('SELECT * FROM entries', (err, rows) => {
+    if (err) {
+      console.error('❌ Error al obtener entradas:', err.message);
+      res.status(500).json({ error: 'Error al obtener entradas' });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// Ruta: registro de nuevos usuarios
 app.post('/api/register', (req, res) => {
   const { name, email, password } = req.body;
 
@@ -45,33 +62,20 @@ app.post('/api/register', (req, res) => {
     bcrypt.hash(password, saltRounds, (err, hash) => {
       if (err) return res.status(500).json({ error: 'Error al encriptar contraseña' });
 
-      db.run('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hash], function (err) {
-        if (err) return res.status(500).json({ error: 'Error al registrar usuario' });
+      db.run(
+        'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
+        [name, email, hash],
+        function (err) {
+          if (err) return res.status(500).json({ error: 'Error al registrar usuario' });
 
-        res.json({ id: this.lastID });
-      });
+          res.json({ id: this.lastID });
+        }
+      );
     });
   });
 });
 
-// Ruta para obtener todas las entradas
-app.get('/api/entries', (req, res) => {
-  db.all('SELECT * FROM entries', (err, rows) => {
-    if (err) {
-      console.error('❌ Error al obtener entradas:', err.message);
-      res.status(500).json({ error: 'Error al obtener entradas' });
-    } else {
-      res.json(rows);
-    }
-  });
-});
-
-// Ruta fallback: para cualquier otra ruta, servir el frontend
-app.get('*', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'entradas.html'));
-});
-
-// Iniciar el servidor
+// Iniciar servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
 });
