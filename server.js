@@ -13,33 +13,30 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Ruta correcta al frontend
+// Servir archivos estáticos desde /frontend
 const frontendPath = path.join(__dirname, 'frontend');
 app.use(express.static(frontendPath));
 
-// Página principal
+// Página de inicio
 app.get('/', (req, res) => {
   res.sendFile(path.join(frontendPath, 'entradas.html'));
 });
 
-// Conexión a la base de datos
-const db = new sqlite3.Database('./database.db', err => {
-  if (err) return console.error(err.message);
-  console.log('📦 Conectado a SQLite');
+// Conexión a base de datos SQLite (ubicada en /backend/database.db)
+const dbPath = path.join(__dirname, 'backend', 'database.db');
+const db = new sqlite3.Database(dbPath, err => {
+  if (err) {
+    console.error('❌ Error al conectar a la base de datos:', err.message);
+  } else {
+    console.log('📦 Conectado a SQLite en /backend/database.db');
+  }
 });
 
-// Aquí irían tus rutas de usuarios, entradas, mensajes, etc.
-
-// Iniciar servidor
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
-});
-
-// GET /api/entries - devuelve todas las entradas
+// Ruta para obtener todas las entradas
 app.get('/api/entries', (req, res) => {
   db.all('SELECT * FROM entries', (err, rows) => {
     if (err) {
-      console.error('Error al obtener entradas:', err.message);
+      console.error('❌ Error al obtener entradas:', err.message);
       res.status(500).json({ error: 'Error al obtener entradas' });
     } else {
       res.json(rows);
@@ -47,3 +44,7 @@ app.get('/api/entries', (req, res) => {
   });
 });
 
+// Iniciar el servidor
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
+});
