@@ -2,26 +2,26 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Registro</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registro</title>
   <link rel="stylesheet" href="styles.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: 'Inter', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
       margin: 0;
-      background: #f0f2f5;
-      padding: 20px;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f0f2f5;
     }
 
     .card {
-      background: white;
-      max-width: 420px;
+      background-color: white;
       width: 100%;
+      max-width: 400px;
       padding: 30px;
       border-radius: 16px;
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
@@ -31,26 +31,26 @@
       text-align: center;
       margin-bottom: 25px;
       font-weight: 600;
+      font-size: 24px;
     }
 
     input {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 12px;
-      font-size: 15px;
+      padding: 14px;
+      margin-bottom: 15px;
+      font-size: 16px;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      box-sizing: border-box;
+      border-radius: 10px;
     }
 
     button[type="submit"] {
       width: 100%;
-      padding: 12px;
+      padding: 14px;
       background-color: #2196F3;
       color: white;
       font-weight: bold;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       font-size: 16px;
       cursor: pointer;
       transition: background 0.2s ease;
@@ -62,44 +62,14 @@
 
     .text-center {
       text-align: center;
-    }
-
-    .text-center a {
-      color: #2196F3;
-      font-size: 14px;
-      text-decoration: none;
-    }
-
-    .text-center a:hover {
-      text-decoration: underline;
+      margin-top: 15px;
     }
 
     #mensaje {
       font-size: 14px;
       min-height: 20px;
-      margin-top: 10px;
-    }
-
-    body.modo-oscuro {
-      background-color: #121212;
-      color: #f1f1f1;
-    }
-
-    body.modo-oscuro .card {
-      background-color: #1e1e1e;
-      color: #f1f1f1;
-      border: 1px solid #444;
-    }
-
-    body.modo-oscuro input,
-    body.modo-oscuro button {
-      background-color: #2c2c2c;
-      color: #f1f1f1;
-      border: 1px solid #555;
-    }
-
-    body.modo-oscuro a {
-      color: #90caf9;
+      text-align: center;
+      color: red;
     }
   </style>
 </head>
@@ -113,56 +83,49 @@
       <input type="password" id="password" placeholder="Contraseña" required />
       <button type="submit">Registrarse</button>
     </form>
-
-    <p id="mensaje" class="text-center"></p>
-
-    <div class="text-center" style="margin-top: 10px;">
+    <p id="mensaje"></p>
+    <div class="text-center">
       <a href="login.html">¿Ya tienes cuenta? Inicia sesión</a>
     </div>
   </div>
 
-  
   <script>
-  const BASE_URL = location.hostname === 'localhost'
-    ? 'http://localhost:3000'
-    : 'https://revende-entradas.onrender.com';
+    document.getElementById('registro-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
 
-  document.getElementById('registro-form').addEventListener('submit', async function (e) {
-    e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const mensaje = document.getElementById('mensaje');
 
-    const nombre = document.getElementById('nombre').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const mensaje = document.getElementById('mensaje');
+      try {
+        const BASE_URL = location.hostname === 'localhost'
+          ? 'http://localhost:3000'
+          : 'https://revende-entradas.onrender.com';
 
-    try {
-      const res = await fetch(`${BASE_URL}/api/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: nombre, email, password })
-      });
+        const res = await fetch(`${BASE_URL}/api/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password })
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (res.ok) {
-        localStorage.setItem('usuarioId', data.id);
-        mensaje.style.color = 'green';
-        mensaje.innerText = '✅ Registro exitoso. Redirigiendo...';
-        setTimeout(() => {
-          window.location.href = 'entradas.html';
-        }, 1000);
-      } else {
-        mensaje.style.color = 'red';
-        mensaje.innerText = `❌ ${data.error || 'Error en el registro'}`;
+        if (res.ok) {
+          mensaje.style.color = 'green';
+          mensaje.innerText = "✅ Registro exitoso. Redirigiendo...";
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 1000);
+        } else {
+          mensaje.innerText = `❌ ${data.error || 'Error al registrarse'}`;
+        }
+      } catch (err) {
+        console.error(err);
+        mensaje.innerText = "❌ Error de conexión con el servidor.";
       }
-    } catch (err) {
-      console.error(err);
-      mensaje.style.color = 'red';
-      mensaje.innerText = '❌ No se pudo conectar con el servidor.';
-    }
-  });
-</script>
-
+    });
+  </script>
 
 </body>
 </html>
