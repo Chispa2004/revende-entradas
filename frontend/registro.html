@@ -121,17 +121,16 @@
     </div>
   </div>
 
+  
   <script>
   const BASE_URL = location.hostname === 'localhost'
     ? 'http://localhost:3000'
     : 'https://revende-entradas.onrender.com';
 
-  const form = document.getElementById('registro-form');
-
-  form.addEventListener('submit', async (e) => {
+  document.getElementById('registro-form').addEventListener('submit', async function (e) {
     e.preventDefault();
 
-    const name = document.getElementById('name').value.trim();
+    const nombre = document.getElementById('nombre').value.trim();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value;
     const mensaje = document.getElementById('mensaje');
@@ -140,29 +139,30 @@
       const res = await fetch(`${BASE_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name: nombre, email, password })
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        mensaje.innerText = '✅ Registro exitoso. Redirigiendo...';
-        mensaje.style.color = 'green';
         localStorage.setItem('usuarioId', data.id);
+        mensaje.style.color = 'green';
+        mensaje.innerText = '✅ Registro exitoso. Redirigiendo...';
         setTimeout(() => {
           window.location.href = 'entradas.html';
         }, 1000);
       } else {
-        mensaje.innerText = '❌ ' + (data.error || 'Error al registrarse');
         mensaje.style.color = 'red';
+        mensaje.innerText = `❌ ${data.error || 'Error en el registro'}`;
       }
     } catch (err) {
       console.error(err);
-      mensaje.innerText = '❌ No se pudo conectar con el servidor.';
       mensaje.style.color = 'red';
+      mensaje.innerText = '❌ No se pudo conectar con el servidor.';
     }
   });
 </script>
+
 
 </body>
 </html>
