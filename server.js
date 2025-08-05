@@ -17,11 +17,6 @@ app.use(bodyParser.json());
 const frontendPath = path.join(__dirname, 'frontend');
 app.use(express.static(frontendPath));
 
-// Página de inicio
-app.get('/', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'entradas.html'));
-});
-
 // Conexión a base de datos SQLite (ubicada en /backend/database.db)
 const dbPath = path.join(__dirname, 'backend', 'database.db');
 const db = new sqlite3.Database(dbPath, err => {
@@ -30,6 +25,33 @@ const db = new sqlite3.Database(dbPath, err => {
   } else {
     console.log('📦 Conectado a SQLite en /backend/database.db');
   }
+});
+
+// Ruta para registrar usuarios
+app.post('/api/register', (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'Faltan datos' });
+  }
+
+  db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
+    if (err) return res.status(500).json({ error: 'Error al verificar usuario' });
+
+    if (row) {
+      return res.status(400).json({ error: 'Ya existe un usuario con ese email' });
+    }
+
+    bcrypt.hash(password, saltRounds, (err, hash) => {
+      if (err) return res.status(500).json({ error: 'Error al encriptar contraseña' });
+
+      db.run('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hash], function (err) {
+        if (err) return res.status(500).json({ error: 'Error al registrar usuario' });
+
+        res.json({ id: this.lastID });
+      });
+    });
+  });
 });
 
 // Ruta para obtener todas las entradas
@@ -44,36 +66,12 @@ app.get('/api/entries', (req, res) => {
   });
 });
 
+// Ruta fallback: para cualquier otra ruta, servir el frontend
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'entradas.html'));
+});
+
 // Iniciar el servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
-});
-
-// Ruta para registrar usuarios
-app.post('/api/register', (req, res) => {
-  const { name, email, password } = req.body;
-
-  if (!name || !email || !password) {
-    return res.status(400).json({ error: 'Faltan datos' });
-  }
-
-  // Verificar si el usuario ya existe
-  db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
-    if (err) return res.status(500).json({ error: 'Error al verificar usuario' });
-
-    if (row) {
-      return res.status(400).json({ error: 'Ya existe un usuario con ese email' });
-    }
-
-    // Encriptar contraseña y guardar
-    bcrypt.hash(password, saltRounds, (err, hash) => {
-      if (err) return res.status(500).json({ error: 'Error al encriptar contraseña' });
-
-      db.run('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hash], function (err) {
-        if (err) return res.status(500).json({ error: 'Error al registrar usuario' });
-
-        res.json({ id: this.lastID });
-      });
-    });
-  });
 });
