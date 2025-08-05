@@ -34,3 +34,16 @@ const db = new sqlite3.Database('./database.db', err => {
 app.listen(PORT, () => {
   console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
 });
+
+// GET /api/entries - devuelve todas las entradas
+app.get('/api/entries', (req, res) => {
+  db.all('SELECT * FROM entries', (err, rows) => {
+    if (err) {
+      console.error('Error al obtener entradas:', err.message);
+      res.status(500).json({ error: 'Error al obtener entradas' });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
