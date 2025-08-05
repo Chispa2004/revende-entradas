@@ -48,3 +48,32 @@ app.get('/api/entries', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
 });
+
+// Ruta para registrar usuarios
+app.post('/api/register', (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: 'Faltan datos' });
+  }
+
+  // Verificar si el usuario ya existe
+  db.get('SELECT * FROM users WHERE email = ?', [email], (err, row) => {
+    if (err) return res.status(500).json({ error: 'Error al verificar usuario' });
+
+    if (row) {
+      return res.status(400).json({ error: 'Ya existe un usuario con ese email' });
+    }
+
+    // Encriptar contraseña y guardar
+    bcrypt.hash(password, saltRounds, (err, hash) => {
+      if (err) return res.status(500).json({ error: 'Error al encriptar contraseña' });
+
+      db.run('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', [name, email, hash], function (err) {
+        if (err) return res.status(500).json({ error: 'Error al registrar usuario' });
+
+        res.json({ id: this.lastID });
+      });
+    });
+  });
+});
