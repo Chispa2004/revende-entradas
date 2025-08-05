@@ -7,19 +7,19 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
 const app = express();
-const PORT = process.env.PORT || 3000; // Compatible con Render
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// Ruta absoluta al frontend
-const frontendPath = path.resolve(__dirname, '../frontend');
+// Ruta correcta al frontend
+const frontendPath = path.join(__dirname, 'frontend');
 app.use(express.static(frontendPath));
 
-// Redirigir "/" a login.html (o index.html si usas ese)
+// Página principal
 app.get('/', (req, res) => {
-  res.sendFile(path.join(frontendPath, 'login.html'));
+  res.sendFile(path.join(frontendPath, 'entradas.html'));
 });
 
 // Conexión a la base de datos
@@ -28,9 +28,7 @@ const db = new sqlite3.Database('./database.db', err => {
   console.log('📦 Conectado a SQLite');
 });
 
-// ... aquí iría todo tu código de rutas y lógica que ya tienes ...
-// (usuarios, entradas, mensajes, etc.)
-// ✅ Puedes copiar y pegar el resto del contenido de tu server.js justo aquí.
+// Aquí irían tus rutas de usuarios, entradas, mensajes, etc.
 
 // Iniciar servidor
 app.listen(PORT, () => {
