@@ -75,6 +75,34 @@ app.post('/api/register', (req, res) => {
   });
 });
 
+// Ruta para iniciar sesión
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Faltan datos' });
+  }
+
+  db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
+    if (err) return res.status(500).json({ error: 'Error al buscar usuario' });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Usuario no encontrado' });
+    }
+
+    bcrypt.compare(password, user.password, (err, result) => {
+      if (err) return res.status(500).json({ error: 'Error al comprobar contraseña' });
+
+      if (result) {
+        res.json({ id: user.id, name: user.name, email: user.email });
+      } else {
+        res.status(401).json({ error: 'Contraseña incorrecta' });
+      }
+    });
+  });
+});
+
+
 // Ruta para login
 app.post('/api/login', (req, res) => {
   const { email, password } = req.body;
