@@ -153,6 +153,27 @@ app.post('/api/login', (req, res) => {
   });
 });
 
+// Ruta: publicar nueva entrada
+app.post('/api/entries', (req, res) => {
+  const { titulo, ciudad, fecha, precio, vendedor_id } = req.body;
+
+  if (!titulo || !ciudad || !fecha || !precio || !vendedor_id) {
+    return res.status(400).json({ error: 'Faltan datos obligatorios' });
+  }
+
+  db.run(
+    `INSERT INTO entries (titulo, ciudad, fecha, precio, vendedor_id) VALUES (?, ?, ?, ?, ?)`,
+    [titulo, ciudad, fecha, precio, vendedor_id],
+    function (err) {
+      if (err) {
+        console.error('❌ Error al insertar entrada:', err.message);
+        return res.status(500).json({ error: 'Error al crear entrada' });
+      }
+      res.json({ id: this.lastID });
+    }
+  );
+});
+
 
 // Iniciar servidor
 app.listen(PORT, () => {
