@@ -34,14 +34,19 @@ const db = new sqlite3.Database(dbPath, err => {
 });
 
 // Crear tabla 'users' si no existe
+// Crear tabla 'messages' si no existe
 db.run(`
-  CREATE TABLE IF NOT EXISTS users (
+  CREATE TABLE IF NOT EXISTS messages (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL
+    remitente_id INTEGER,
+    destinatario_id INTEGER,
+    mensaje TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    leido INTEGER DEFAULT 0
   )
 `);
+
+
 
 // Crear tabla 'entries' si no existe
 db.run(`
