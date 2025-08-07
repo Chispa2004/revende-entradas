@@ -5,9 +5,133 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mis entradas publicadas</title>
   <link rel="stylesheet" href="styles.css" />
-  <style>
-    /* ... (estilos sin cambios) ... */
-  </style>
+
+    <style>
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f0f2f5;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  .container h2 {
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 26px;
+    color: #222;
+  }
+
+  .entrada-card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .entrada-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .entrada-card h3 {
+    margin: 0 0 12px;
+    font-size: 22px;
+    color: #333;
+  }
+
+  .entrada-card p {
+    margin: 4px 0;
+    color: #555;
+    font-size: 16px;
+  }
+
+  .entrada-card .estado {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #2196f3;
+  }
+
+  .entrada-card .estado.vendida {
+    color: #4caf50;
+  }
+
+  .botones {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .entrada-card button {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 16px;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .btn-eliminar {
+    background-color: #f44336;
+    color: white;
+  }
+
+  .btn-eliminar:hover {
+    background-color: #d32f2f;
+  }
+
+  .btn-editar {
+    background-color: #2196f3;
+    color: white;
+  }
+
+  .btn-editar:hover {
+    background-color: #1976d2;
+  }
+
+  /* 🌙 Modo oscuro */
+  body.modo-oscuro {
+    background-color: #121212;
+    color: #f1f1f1;
+  }
+
+  body.modo-oscuro .entrada-card {
+    background-color: #1f1f1f;
+    border: 1px solid #333;
+  }
+
+  body.modo-oscuro .entrada-card p {
+    color: #ccc;
+  }
+
+  body.modo-oscuro .btn-eliminar {
+    background-color: #e53935;
+  }
+
+  body.modo-oscuro .btn-eliminar:hover {
+    background-color: #c62828;
+  }
+
+  body.modo-oscuro .btn-editar {
+    background-color: #42a5f5;
+  }
+
+  body.modo-oscuro .btn-editar:hover {
+    background-color: #1e88e5;
+  }
+</style>
+
+
 </head>
 <body>
 
@@ -55,7 +179,10 @@
             <p>📍 Ciudad: ${e.ciudad}</p>
             <p>📅 Fecha: ${e.fecha}</p>
             <p>💶 Precio: ${e.precio} €</p>
-            <p class="estado">Estado: ${e.comprador_id ? '✅ Vendida' : '🟢 Disponible'}</p>
+            <p class="estado ${e.comprador_id ? 'vendida' : ''}">
+              Estado: ${e.comprador_id ? '✅ Vendida' : '🟢 Disponible'}
+            </p>
+
             <div class="botones">
               ${!e.comprador_id ? `
                 <button class="btn-editar" onclick="editarEntrada(${e.id}, '${e.titulo}', '${e.ciudad}', '${e.fecha}', ${e.precio})">Editar</button>
