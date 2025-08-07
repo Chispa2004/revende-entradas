@@ -33,13 +33,24 @@ const db = new sqlite3.Database(dbPath, err => {
   }
 });
 
-// Crear tabla de usuarios si no existe
+// Crear tabla 'users' si no existe
 db.run(`
   CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL
+  )
+`);
+
+// Crear tabla 'entries' si no existe
+db.run(`
+  CREATE TABLE IF NOT EXISTS entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    titulo TEXT NOT NULL,
+    descripcion TEXT,
+    precio REAL,
+    usuario_id INTEGER
   )
 `);
 
