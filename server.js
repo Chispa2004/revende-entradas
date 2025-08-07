@@ -23,7 +23,7 @@ app.get('/', (req, res) => {
 });
 
 // Conexión a base de datos SQLite (ubicada en /backend/database.db)
-const dbPath = path.join(__dirname, 'backend', 'database.db');
+const dbPath = path.join(__dirname, 'database.db');
 const db = new sqlite3.Database(dbPath, err => {
   if (err) {
     console.error('❌ Error al conectar a la base de datos:', err.message);
@@ -74,6 +74,34 @@ app.post('/api/register', (req, res) => {
     });
   });
 });
+
+// Ruta para login
+app.post('/api/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Faltan datos' });
+  }
+
+  db.get('SELECT * FROM users WHERE email = ?', [email], (err, user) => {
+    if (err) return res.status(500).json({ error: 'Error al buscar usuario' });
+
+    if (!user) {
+      return res.status(400).json({ error: 'Usuario no encontrado' });
+    }
+
+    bcrypt.compare(password, user.password, (err, result) => {
+      if (err) return res.status(500).json({ error: 'Error al comprobar contraseña' });
+
+      if (result) {
+        res.json({ id: user.id, name: user.name, email: user.email });
+      } else {
+        res.status(401).json({ error: 'Contraseña incorrecta' });
+      }
+    });
+  });
+});
+
 
 // Iniciar servidor
 app.listen(PORT, () => {
