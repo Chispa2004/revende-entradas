@@ -175,6 +175,31 @@ app.post('/api/entries', (req, res) => {
 });
 
 
+// Ruta: obtener conversaciones de un usuario
+app.get('/api/conversaciones/:id', (req, res) => {
+  const usuarioId = req.params.id;
+
+  db.all(
+    `SELECT *
+     FROM messages
+     WHERE remitente_id = ? OR destinatario_id = ?
+     GROUP BY CASE 
+                WHEN remitente_id = ? THEN destinatario_id
+                ELSE remitente_id
+              END
+     ORDER BY timestamp DESC`,
+    [usuarioId, usuarioId, usuarioId],
+    (err, rows) => {
+      if (err) {
+        console.error('❌ Error al obtener mensajes:', err.message);
+        return res.status(500).json({ error: 'Error al obtener mensajes' });
+      }
+      res.json(rows);
+    }
+  );
+});
+
+
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor escuchando en http://localhost:${PORT}`);
